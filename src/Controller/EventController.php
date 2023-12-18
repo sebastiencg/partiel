@@ -31,9 +31,14 @@ class EventController extends AbstractController
     #[Route('/public/', name: 'app_event_all', methods: ['GET'])]
     public function allEventPublic(EventRepository $eventRepository): Response
     {
-        return $this->json($eventRepository->findBy(["statut"=>"public"]),Response::HTTP_OK,[],['event'=>'profile:read-one']);
+        return $this->json($eventRepository->findBy(["statut"=>"public"]),Response::HTTP_OK,[],['groups'=>'event:read-one']);
     }
 
+    #[Route('/mine', name: 'app_event_mine', methods: ['GET'])]
+    public function eventMine(EventRepository $eventRepository): Response
+    {
+        return $this->json($eventRepository->findByParticipants($this->getUser()->getProfile()),Response::HTTP_OK,[],['groups'=>'event:read-one']);
+    }
     #[Route('/new', name: 'app_event_newEvent', methods: ['POST'])]
     public function newEvent(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager): Response
     {

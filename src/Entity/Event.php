@@ -15,14 +15,14 @@ class Event
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['event:read-one','event:read-all'])]
+    #[Groups(['event:read-one','event:read-all','invitation:read-all'])]
     private ?int $id = null;
 
-    #[Groups(['event:read-one','event:read-all'])]
+    #[Groups(['event:read-one','event:read-all','invitation:read-all'])]
     #[ORM\Column(length: 255)]
     private ?string $place = null;
 
-    #[Groups(['event:read-one','event:read-all'])]
+    #[Groups(['event:read-one','event:read-all','invitation:read-all'])]
     #[ORM\Column(type: Types::TEXT)]
     private ?string $description = null;
 
@@ -43,7 +43,7 @@ class Event
     #[Groups(['event:read-one','event:read-all'])]
     #[ORM\Column(length: 255)]
     private ?string $placeType = null;
-    #[Groups(['event:read-one','event:read-all'])]
+    #[Groups(['event:read-one','event:read-all','invitation:read-all'])]
     #[ORM\ManyToOne(inversedBy: 'authorEvent')]
     private ?Profile $author = null;
     #[Groups(['event:read-one'])]

@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\InvitationRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: InvitationRepository::class)]
 class Invitation
@@ -11,16 +12,20 @@ class Invitation
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    #[Groups(['invitation:read-all'])]
 
+    private ?int $id = null;
+    #[Groups(['invitation:read-all'])]
     #[ORM\ManyToOne(inversedBy: 'invitations')]
     private ?Event $privateEvent = null;
-
+    #[Groups(['invitation:read-all'])]
     #[ORM\ManyToOne(inversedBy: 'invitations')]
     private ?Profile $profile = null;
+    #[Groups(['invitation:read-all'])]
+    #[ORM\Column(length: 255)]
+    private ?string $statut = null;
 
-    #[ORM\Column]
-    private ?bool $accpetedInvitation = null;
+
 
     public function getId(): ?int
     {
@@ -51,15 +56,17 @@ class Invitation
         return $this;
     }
 
-    public function isAccpetedInvitation(): ?bool
+    public function getStatut(): ?string
     {
-        return $this->accpetedInvitation;
+        return $this->statut;
     }
 
-    public function setAccpetedInvitation(bool $accpetedInvitation): static
+    public function setStatut(string $statut): static
     {
-        $this->accpetedInvitation = $accpetedInvitation;
+        $this->statut = $statut;
 
         return $this;
     }
+
+
 }

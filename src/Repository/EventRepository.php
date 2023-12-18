@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Event;
+use App\Entity\Profile;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -20,7 +21,15 @@ class EventRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Event::class);
     }
-
+    public function findByParticipants(Profile $profile)
+    {
+        return $this->createQueryBuilder('e')
+            ->join('e.participants', 'p')
+            ->where('p.id = :profileId')
+            ->setParameter('profileId', $profile->getId())
+            ->getQuery()
+            ->getResult();
+    }
 //    /**
 //     * @return Event[] Returns an array of Event objects
 //     */

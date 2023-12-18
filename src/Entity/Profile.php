@@ -14,10 +14,10 @@ class Profile
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['profile:read-all','profile:read-one','event:read-one','event:read-all'])]
+    #[Groups(['profile:read-all','profile:read-one','event:read-one','event:read-all','invitation:read-all'])]
     private ?int $id = null;
 
-    #[Groups(['profile:read-all','profile:read-one','event:read-one','event:read-all'])]
+    #[Groups(['profile:read-all','profile:read-one','event:read-one','event:read-all','invitation:read-all'])]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $username = null;
     #[ORM\OneToOne(inversedBy: 'profile', cascade: ['persist', 'remove'])]
