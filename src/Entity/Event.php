@@ -15,14 +15,14 @@ class Event
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['event:read-one','event:read-all','invitation:read-all'])]
+    #[Groups(['event:read-one','event:read-all','invitation:read-all','contribution:read-all'])]
     private ?int $id = null;
 
-    #[Groups(['event:read-one','event:read-all','invitation:read-all'])]
+    #[Groups(['event:read-one','event:read-all','invitation:read-all','contribution:read-all'])]
     #[ORM\Column(length: 255)]
     private ?string $place = null;
 
-    #[Groups(['event:read-one','event:read-all','invitation:read-all'])]
+    #[Groups(['event:read-one','event:read-all','invitation:read-all','contribution:read-all'])]
     #[ORM\Column(type: Types::TEXT)]
     private ?string $description = null;
 
@@ -43,7 +43,7 @@ class Event
     #[Groups(['event:read-one','event:read-all'])]
     #[ORM\Column(length: 255)]
     private ?string $placeType = null;
-    #[Groups(['event:read-one','event:read-all','invitation:read-all'])]
+    #[Groups(['event:read-one','event:read-all','invitation:read-all','contribution:read-all'])]
     #[ORM\ManyToOne(inversedBy: 'authorEvent')]
     private ?Profile $author = null;
     #[Groups(['event:read-one'])]
@@ -53,10 +53,17 @@ class Event
     #[ORM\OneToMany(mappedBy: 'privateEvent', targetEntity: Invitation::class)]
     private Collection $invitations;
 
+    #[ORM\Column(nullable: true)]
+    private ?bool $cancel = null;
+
+    #[ORM\OneToMany(mappedBy: 'event', targetEntity: Contributions::class)]
+    private Collection $contributions;
+
     public function __construct()
     {
         $this->participants = new ArrayCollection();
         $this->invitations = new ArrayCollection();
+        $this->contributions = new ArrayCollection();
     }
 
 
@@ -199,6 +206,48 @@ class Event
             // set the owning side to null (unless already changed)
             if ($invitation->getPrivateEvent() === $this) {
                 $invitation->setPrivateEvent(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function isCancel(): ?bool
+    {
+        return $this->cancel;
+    }
+
+    public function setCancel(?bool $cancel): static
+    {
+        $this->cancel = $cancel;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Contributions>
+     */
+    public function getContributions(): Collection
+    {
+        return $this->contributions;
+    }
+
+    public function addContribution(Contributions $contribution): static
+    {
+        if (!$this->contributions->contains($contribution)) {
+            $this->contributions->add($contribution);
+            $contribution->setEvent($this);
+        }
+
+        return $this;
+    }
+
+    public function removeContribution(Contributions $contribution): static
+    {
+        if ($this->contributions->removeElement($contribution)) {
+            // set the owning side to null (unless already changed)
+            if ($contribution->getEvent() === $this) {
+                $contribution->setEvent(null);
             }
         }
 

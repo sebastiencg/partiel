@@ -21,7 +21,7 @@ class EventRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Event::class);
     }
-    public function findByParticipants(Profile $profile)
+    public function findByParticipation(Profile $profile)
     {
         return $this->createQueryBuilder('e')
             ->join('e.participants', 'p')

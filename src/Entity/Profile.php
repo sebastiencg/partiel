@@ -14,10 +14,10 @@ class Profile
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['profile:read-all','profile:read-one','event:read-one','event:read-all','invitation:read-all'])]
+    #[Groups(['profile:read-all','profile:read-one','event:read-one','event:read-all','invitation:read-all','contribution:read-all'])]
     private ?int $id = null;
 
-    #[Groups(['profile:read-all','profile:read-one','event:read-one','event:read-all','invitation:read-all'])]
+    #[Groups(['profile:read-all','profile:read-one','event:read-one','event:read-all','invitation:read-all','contribution:read-all'])]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $username = null;
     #[ORM\OneToOne(inversedBy: 'profile', cascade: ['persist', 'remove'])]
@@ -37,11 +37,15 @@ class Profile
     #[ORM\OneToMany(mappedBy: 'profile', targetEntity: Invitation::class)]
     private Collection $invitations;
 
+    #[ORM\OneToMany(mappedBy: 'contributor', targetEntity: Contributions::class)]
+    private Collection $contributions;
+
     public function __construct()
     {
         $this->authorEvent = new ArrayCollection();
         $this->events = new ArrayCollection();
         $this->invitations = new ArrayCollection();
+        $this->contributions = new ArrayCollection();
     }
 
 
@@ -171,6 +175,36 @@ class Profile
             // set the owning side to null (unless already changed)
             if ($invitation->getProfile() === $this) {
                 $invitation->setProfile(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Contributions>
+     */
+    public function getContributions(): Collection
+    {
+        return $this->contributions;
+    }
+
+    public function addContribution(Contributions $contribution): static
+    {
+        if (!$this->contributions->contains($contribution)) {
+            $this->contributions->add($contribution);
+            $contribution->setContributor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeContribution(Contributions $contribution): static
+    {
+        if ($this->contributions->removeElement($contribution)) {
+            // set the owning side to null (unless already changed)
+            if ($contribution->getContributor() === $this) {
+                $contribution->setContributor(null);
             }
         }
 

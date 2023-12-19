@@ -66,6 +66,9 @@ class InvitationController extends AbstractController
             $entityManager->flush();
             return $this->json(['error' => 'event has already taken place impossible to modify the status'], Response::HTTP_OK);
         }
+        if ($invitation->getPrivateEvent()->isCancel()){
+            return $this->json(["message"=>"this event cancel sorry"],Response::HTTP_OK,[]);
+        }
         $invitation->setStatut("accepted");
         $invitation->getPrivateEvent()->addInvitation($this->getUser()->getProfile());
         $entityManager->persist($invitation);
