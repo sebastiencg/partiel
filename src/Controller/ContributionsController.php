@@ -61,7 +61,7 @@ class ContributionsController extends AbstractController
         return $this->json("contribution delete", Response::HTTP_BAD_REQUEST);
 
     }
-    #[Route('/{id}/mySupported', name: 'app_contribution_mySupported', methods: ['POST'])]
+    #[Route('/{id}/mySupported', name: 'app_contribution_mySupported', methods: ['GET'])]
     public function mySupported(Event $event,Request $request,SerializerInterface $serializer,EntityManagerInterface $entityManager): Response
     {
         if (!in_array($this->getUser()->getProfile(),$event->getParticipants()->getValues())){
