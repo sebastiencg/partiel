@@ -29,7 +29,7 @@ class ContributionsController extends AbstractController
         $entityManager->flush();
         return $this->json($contribution,Response::HTTP_OK,[],['groups'=>'contribution:read-all']);
     }
-    #[Route('/supported/{id}', name: 'app_contribution_supported', methods: ['POST'])]
+    #[Route('/supported/{id}', name: 'app_contribution_supported', methods: ['GET'])]
     public function supported(Contributions $contribution,EntityManagerInterface $entityManager): Response
     {
         if (!in_array($this->getUser()->getProfile(),$contribution->getEvent()->getParticipants()->getValues())){
@@ -51,12 +51,12 @@ class ContributionsController extends AbstractController
     }
 
     #[Route('/delete/{id}', name: 'app_contribution_remove', methods: ['DELETE'])]
-    public function removeContribution(Event $event,EntityManagerInterface $entityManager): Response
+    public function removeContribution(Contributions $contribution,EntityManagerInterface $entityManager): Response
     {
-        if ($event->getAuthor()!==$this->getUser()->getProfile()){
+        if ($contribution->getEvent()->getAuthor()!==$this->getUser()->getProfile()){
             return $this->json("you are not the author of the event to create a suggestion", Response::HTTP_BAD_REQUEST);
         }
-        $entityManager->remove($event);
+        $entityManager->remove($contribution);
         $entityManager->flush();
         return $this->json("contribution delete", Response::HTTP_BAD_REQUEST);
 
@@ -67,13 +67,12 @@ class ContributionsController extends AbstractController
         if (!in_array($this->getUser()->getProfile(),$event->getParticipants()->getValues())){
             return $this->json(["message"=>"this is a private event sorry"],Response::HTTP_OK);
         }
-        $json = $request->getContent();
-        $contribution = $serializer->deserialize($json, Contributions::class, 'json');
-        $contribution->setEvent($event);
-        $contribution->setContributor($this->getUser()->getProfile());
-        $contribution->setSuggestion(false);
-        $entityManager->persist($contribution);
-        $entityManager->flush();
+        $contribution=[];
+        foreach ($event->getContributions()->getValues() as $value){
+            if ($value->getContributor()==$this->getUser()->getProfile()){
+                $contribution[] = $value;
+            }
+        }
         return $this->json($contribution,Response::HTTP_OK,[],['groups'=>'contribution:read-all']);
     }
 
